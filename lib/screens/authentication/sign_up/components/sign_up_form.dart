@@ -1,0 +1,251 @@
+import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+import 'package:sexual_health_assignment/models/models.dart';
+// import 'package:sexual_health_assignment/provider/provider.dart';
+import 'package:sexual_health_assignment/utilities/utilities.dart';
+import 'package:sexual_health_assignment/widgets/widgets.dart';
+
+class SignUpForm extends StatefulWidget {
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  SignUpForm({Key? key, required this.scaffoldKey}) : super(key: key);
+
+  @override
+  _SignUpFormState createState() => _SignUpFormState();
+}
+
+class _SignUpFormState extends State<SignUpForm> {
+  final _signUpFormKey = GlobalKey<FormState>();
+
+  UserModel? user;
+
+  String? email;
+  String? fullName;
+  String? password;
+  String? confirmPassword;
+
+  final List<String> errors = [];
+
+  final _focusPassword = FocusNode();
+  final _focusConfirmPassword = FocusNode();
+  final _focusEmail = FocusNode();
+
+  TextEditingController? passwordTextController;
+  TextEditingController? confirmPasswordTextController;
+
+  void addError({String? error}) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error!);
+      });
+    }
+  }
+
+  void removeError({String? error}) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
+  }
+
+  TextFormField buildFullNameField() {
+    return TextFormField(
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.text,
+      onSaved: (newValue) => fullName = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: Constants.kNamelNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: Constants.kNamelNullError);
+          return '';
+        }
+        return null;
+      },
+      onFieldSubmitted: (value) {
+        FocusScope.of(context).requestFocus(_focusEmail);
+      },
+      decoration: InputDecoration(
+        labelText: 'Full Name',
+        hintText: 'Enter your full name',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: Icon(Icons.person),
+      ),
+    );
+  }
+
+  TextFormField buildEmailField() {
+    return TextFormField(
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
+      focusNode: _focusEmail,
+      onSaved: (newValue) => email = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: Constants.kInvalidEmailError);
+        } else if (Constants.emailValidatorRegExp.hasMatch(value)) {
+          removeError(error: Constants.kInvalidEmailError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: Constants.kInvalidEmailError);
+          return '';
+        } else if (!Constants.emailValidatorRegExp.hasMatch(value)) {
+          addError(error: Constants.kInvalidEmailError);
+          return '';
+        }
+        return null;
+      },
+      onFieldSubmitted: (value) {
+        FocusScope.of(context).requestFocus(_focusPassword);
+      },
+      decoration: InputDecoration(
+        labelText: 'Email',
+        hintText: 'Enter your email',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: Icon(Icons.email),
+      ),
+    );
+  }
+
+  TextFormField buildPasswordFormField() {
+    return TextFormField(
+      obscureText: true,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.text,
+      controller: passwordTextController,
+      focusNode: _focusPassword,
+      onFieldSubmitted: (value) {
+        FocusScope.of(context).requestFocus(_focusConfirmPassword);
+      },
+      onSaved: (newValue) => password = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: Constants.kPassNullError);
+        } else if (value.length < 6) {
+          removeError(error: Constants.kShortPassError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: Constants.kPassNullError);
+          return '';
+        } else if (value.length < 6) {
+          addError(error: Constants.kShortPassError);
+          return '';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: 'Password',
+        hintText: 'Enter your password',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: Icon(Icons.vpn_key),
+      ),
+    );
+  }
+
+  TextFormField buildConfirmPasswordFormField() {
+    return TextFormField(
+      obscureText: true,
+      textInputAction: TextInputAction.done,
+      keyboardType: TextInputType.number,
+      controller: confirmPasswordTextController,
+      focusNode: _focusConfirmPassword,
+      onFieldSubmitted: (value) {
+        KeyboardUtil.hideKeyboard(context);
+        registrationButtonPressed();
+      },
+      onSaved: (newValue) => confirmPassword = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: Constants.kPassNullError);
+        } else if (value.length < 4) {
+          removeError(error: Constants.kShortPassError);
+        } else if (value != passwordTextController!.text) {
+          removeError(error: Constants.kMatchPassError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: Constants.kPassNullError);
+          return '';
+        } else if (value.length < 4) {
+          addError(error: Constants.kShortPassError);
+          return '';
+        } else if (value != passwordTextController!.text) {
+          addError(error: Constants.kMatchPassError);
+          return '';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: 'Confirm Password',
+        hintText: 'Enter your password again',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: Icon(Icons.vpn_key),
+      ),
+    );
+  }
+
+  // _registrationHandler(UserModel user) async {
+  //   return await context.read<AuthProvider>().createUser(user);
+  // }
+
+  registrationButtonPressed() {
+    final FormState _formState = _signUpFormKey.currentState!;
+    if (_formState.validate()) {
+      _formState.save();
+
+      KeyboardUtil.hideKeyboard(context);
+    }
+  }
+
+  @override
+  void initState() {
+    passwordTextController = TextEditingController();
+    confirmPasswordTextController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    passwordTextController!.dispose();
+    confirmPasswordTextController!.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _signUpFormKey,
+      child: Column(
+        children: [
+          buildFullNameField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildEmailField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildPasswordFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildConfirmPasswordFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          FormError(errors: errors),
+          SizedBox(height: getProportionateScreenHeight(20)),
+          GlobalActionButton(
+            action: 'Register',
+            onPressed: registrationButtonPressed,
+          ),
+          SizedBox(height: DeviceConfig.screenHeight! * 0.01),
+        ],
+      ),
+    );
+  }
+}

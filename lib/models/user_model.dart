@@ -8,6 +8,7 @@ class UserModel {
   String? name;
   String? gender;
   String? genitalia;
+  String? token;
 
   UserModel({
     this.email,
@@ -17,6 +18,7 @@ class UserModel {
     this.name,
     this.gender,
     this.genitalia,
+    this.token,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -32,5 +34,6 @@ class UserModel {
         'name': name,
         'gender': gender,
         'genitalia': genitalia,
+        'token': token,
       };
 }

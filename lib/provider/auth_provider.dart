@@ -77,4 +77,14 @@ class AuthProvider extends ChangeNotifier {
       return error.message;
     }
   }
+
+  /*
+  USER LOGOUT
+  */
+  Future<void> signOut() async {
+    await auth.signOut();
+    _status = Status.Unauthenticated;
+    notifyListeners();
+    return Future.delayed(Duration.zero);
+  }
 }

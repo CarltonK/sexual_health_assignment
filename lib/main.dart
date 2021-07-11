@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:sexual_health_assignment/provider/provider.dart';
+import 'package:sexual_health_assignment/screens/screens.dart';
 import 'package:sexual_health_assignment/widgets/widgets.dart';
+
+import 'utilities/utilities.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +33,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Troglo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: FutureBuilder<FirebaseApp>(
         future: _initialization,
         builder: (context, snapshot) {
+          DeviceConfig().init(context);
           if (snapshot.hasError) {
             return GlobalErrorContained(
               errorMessage: '${snapshot.error.toString()}',
@@ -44,12 +49,12 @@ class MyApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             return Consumer<AuthProvider>(
               builder: (context, value, child) {
-                if (value.status == Status.Authenticated) return Container();
+                if (value.status == Status.Authenticated) return HomePage();
                 if (value.status == Status.Authenticating)
                   return GlobalLoader();
                 return child!;
               },
-              child: Container(),
+              child: SignInScreen(),
             );
           }
           return GlobalLoader();

@@ -13,7 +13,7 @@ logger.setLogLevel('debug');
 const runOptions: functions.RuntimeOptions = {
   timeoutSeconds: 60,
   memory: '128MB',
-  ingressSettings: "ALLOW_ALL",
+  ingressSettings: 'ALLOW_ALL',
 };
 const regionalFunctions = functions.runWith(runOptions).region('europe-west3');
 

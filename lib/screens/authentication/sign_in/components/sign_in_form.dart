@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sexual_health_assignment/models/models.dart';
@@ -20,6 +22,8 @@ class _SignInFormState extends State<SignInForm> {
   UserModel? user;
   String? email, password;
   final List<String> errors = [];
+
+  dynamic _loginResult;
 
   final _focusPassword = FocusNode();
 
@@ -107,8 +111,15 @@ class _SignInFormState extends State<SignInForm> {
     );
   }
 
-  Future loginHandler(UserModel user) async {
-    return await context.read<AuthProvider>().signInEmailPass(user);
+  Future<bool> loginHandler(UserModel user) async {
+    _loginResult = await context.read<AuthProvider>().signInEmailPass(user);
+
+    if (_loginResult.runtimeType == String) {
+      return false;
+    } else {
+      user.uid = _loginResult.uid;
+      return true;
+    }
   }
 
   loginButtonPressed() {
@@ -117,6 +128,29 @@ class _SignInFormState extends State<SignInForm> {
       _formState.save();
 
       KeyboardUtil.hideKeyboard(context);
+
+      user = UserModel(
+        email: email,
+        password: password,
+      );
+
+      loginHandler(user!).then((value) {
+        if (!value) {
+          Timer(Duration(milliseconds: 500), () async {
+            await showInfoDialog(
+              widget.scaffoldKey.currentContext!,
+              _loginResult,
+            );
+          });
+        }
+      }).catchError((error) {
+        Timer(Duration(milliseconds: 500), () async {
+          await showInfoDialog(
+            widget.scaffoldKey.currentContext!,
+            error.toString(),
+          );
+        });
+      });
     }
   }
 

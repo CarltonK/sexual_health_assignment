@@ -6,6 +6,11 @@ class DatabaseProvider {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseMessaging fcm = FirebaseMessaging.instance;
 
+  DatabaseProvider() {
+    // Comment this line for production
+    // _db.useFirestoreEmulator('192.168.100.11', 4001);
+  }
+
   Future saveUser(UserModel user, String uid) async {
     user.uid = uid;
     try {

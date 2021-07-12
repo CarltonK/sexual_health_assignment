@@ -1,0 +1,20 @@
+version: '3.3' # Requires Docker engine 18.02.0+\
+
+services:
+  troglo_backend:
+    container_name: troglo_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:   # Binds volume to enable working through docker locally
+      - type: bind
+        source: .
+        target: /app/
+    ports: 
+      - '8080:8080'
+      - '9099:9099'
+    # attach terminal
+    tty: true
+    network_mode: "host"
+    environment: 
+      NODE_ENV: "local"

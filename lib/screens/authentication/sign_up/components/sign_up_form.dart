@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:sexual_health_assignment/models/models.dart';
-// import 'package:sexual_health_assignment/provider/provider.dart';
+import 'package:sexual_health_assignment/provider/provider.dart';
 import 'package:sexual_health_assignment/utilities/utilities.dart';
 import 'package:sexual_health_assignment/widgets/widgets.dart';
 
@@ -22,6 +24,8 @@ class _SignUpFormState extends State<SignUpForm> {
   String? fullName;
   String? password;
   String? confirmPassword;
+
+  dynamic _registrationResult;
 
   final List<String> errors = [];
 
@@ -52,7 +56,7 @@ class _SignUpFormState extends State<SignUpForm> {
     return TextFormField(
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
-      onSaved: (newValue) => fullName = newValue,
+      onSaved: (newValue) => fullName = newValue!.trim(),
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: Constants.kNamelNullError);
@@ -83,7 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
       focusNode: _focusEmail,
-      onSaved: (newValue) => email = newValue,
+      onSaved: (newValue) => email = newValue!.trim(),
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: Constants.kInvalidEmailError);
@@ -124,7 +128,7 @@ class _SignUpFormState extends State<SignUpForm> {
       onFieldSubmitted: (value) {
         FocusScope.of(context).requestFocus(_focusConfirmPassword);
       },
-      onSaved: (newValue) => password = newValue,
+      onSaved: (newValue) => password = newValue!.trim(),
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: Constants.kPassNullError);
@@ -156,7 +160,7 @@ class _SignUpFormState extends State<SignUpForm> {
     return TextFormField(
       obscureText: true,
       textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.text,
       controller: confirmPasswordTextController,
       focusNode: _focusConfirmPassword,
       onFieldSubmitted: (value) {
@@ -167,7 +171,7 @@ class _SignUpFormState extends State<SignUpForm> {
       onChanged: (value) {
         if (value.isNotEmpty) {
           removeError(error: Constants.kPassNullError);
-        } else if (value.length < 4) {
+        } else if (value.length < 6) {
           removeError(error: Constants.kShortPassError);
         } else if (value != passwordTextController!.text) {
           removeError(error: Constants.kMatchPassError);
@@ -178,7 +182,7 @@ class _SignUpFormState extends State<SignUpForm> {
         if (value!.isEmpty) {
           addError(error: Constants.kPassNullError);
           return '';
-        } else if (value.length < 4) {
+        } else if (value.length < 6) {
           addError(error: Constants.kShortPassError);
           return '';
         } else if (value != passwordTextController!.text) {
@@ -196,9 +200,16 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  // _registrationHandler(UserModel user) async {
-  //   return await context.read<AuthProvider>().createUser(user);
-  // }
+  Future<bool> _regHandler(UserModel user) async {
+    _registrationResult = await context.read<AuthProvider>().createUser(user);
+
+    if (_registrationResult.runtimeType == String) {
+      return false;
+    } else {
+      user.uid = _registrationResult.uid;
+      return true;
+    }
+  }
 
   registrationButtonPressed() {
     final FormState _formState = _signUpFormKey.currentState!;
@@ -206,6 +217,32 @@ class _SignUpFormState extends State<SignUpForm> {
       _formState.save();
 
       KeyboardUtil.hideKeyboard(context);
+
+      user = UserModel(
+        email: email,
+        name: fullName,
+        password: confirmPassword,
+      );
+
+      _regHandler(user!).then((value) {
+        if (!value) {
+          Timer(Duration(milliseconds: 500), () async {
+            await showInfoDialog(
+              widget.scaffoldKey.currentContext!,
+              _registrationResult,
+            );
+          });
+        } else {
+          Navigator.of(context).pop();
+        }
+      }).catchError((error) {
+        Timer(Duration(milliseconds: 500), () async {
+          await showInfoDialog(
+            widget.scaffoldKey.currentContext!,
+            error.toString(),
+          );
+        });
+      });
     }
   }
 

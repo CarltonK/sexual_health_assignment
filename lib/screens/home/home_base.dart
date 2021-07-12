@@ -1,6 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sexual_health_assignment/helpers/helpers.dart';
 import 'package:sexual_health_assignment/models/models.dart';
 import 'package:sexual_health_assignment/provider/provider.dart';
 import 'package:sexual_health_assignment/utilities/utilities.dart';
@@ -17,6 +19,11 @@ class _HomePageState extends State<HomePage> {
 
   int _index = 0;
   PageController? _controller;
+
+  // ignore: unused_field
+  NotificationHelper? _notificationHelper;
+
+  Dialogs? _dialogs;
 
   final List<Widget> _pages = [
     Container(),
@@ -116,12 +123,42 @@ class _HomePageState extends State<HomePage> {
     return _buildPopStack() ?? false;
   }
 
+  void popDialog() {
+    Navigator.of(context).pop();
+  }
+
+  onForegroundMessage() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.notification != null) {
+        RemoteNotification notification = message.notification!;
+        await _dialogs!.dialogInfo(
+          context,
+          notification.title,
+          notification.body,
+          () => popDialog(),
+          'Cancel',
+        );
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-
+    // Page View Controller
     _controller = PageController();
+    // Dialogs
+    _dialogs = Dialogs.empty();
+
+    // Messaging Handler
+    onForegroundMessage();
+    _notificationHelper = NotificationHelper();
+
+    // Globally retrieve auth
     _authProvider = context.read<AuthProvider>();
+    // Globally retrieve user future
+    getUserFuture =
+        context.read<DatabaseProvider>().getUser(_authProvider!.user.uid);
   }
 
   @override
@@ -140,6 +177,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         body: _body(),
         bottomNavigationBar: _bottomBar(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {},
+        ),
       ),
     );
   }

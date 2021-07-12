@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,8 @@ import 'utilities/utilities.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   final List<SingleChildWidget> _providers = [
     ChangeNotifierProvider(create: (context) => AuthProvider.instance()),
     Provider(create: (context) => DatabaseProvider())
@@ -23,6 +26,10 @@ void main() {
       child: MyApp(),
     ),
   );
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {

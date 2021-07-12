@@ -26,4 +26,14 @@ class DatabaseProvider {
       rethrow;
     }
   }
+
+  Future getUser(String uid) async {
+    try {
+      DocumentReference userDoc = _db.doc('users/$uid');
+      DocumentSnapshot snapshot = await userDoc.get();
+      return UserModel.fromFirestore(snapshot);
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
 }

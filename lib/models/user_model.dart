@@ -22,13 +22,20 @@ class UserModel {
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    // Object? data = doc.data();
-    return UserModel();
+    if (doc.exists) {
+      dynamic data = doc.data();
+      return UserModel(
+        email: data['email'] ?? '',
+        name: data['name'] ?? '',
+        uid: doc.id,
+      );
+    } else {
+      return UserModel();
+    }
   }
 
   Map<String, dynamic> toFirestore() => {
         'email': email,
-        'password': password,
         'uid': uid,
         'dob': dob,
         'name': name,

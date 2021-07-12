@@ -15,7 +15,7 @@ service cloud.firestore {
     }
 
     match /users/{user} {
-      allow write: if isAuthenticated() && isOwner(user);
+      allow read, write: if isAuthenticated() && isOwner(user);
     }
   }
 }

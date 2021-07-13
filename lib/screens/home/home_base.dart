@@ -16,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   AuthProvider? _authProvider;
   Future? getUserFuture;
+  Stream? getUserStream;
 
   int _index = 0;
   PageController? _controller;
@@ -66,6 +67,32 @@ class _HomePageState extends State<HomePage> {
       leftCornerRadius: 32,
       rightCornerRadius: 32,
       splashSpeedInMilliseconds: 200,
+    );
+  }
+
+  _bodyStream() {
+    return StreamBuilder(
+      stream: getUserStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: GlobalInfoDialog(message: '${snapshot.error}'));
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return GlobalLoader();
+        }
+        return Provider<UserModel>(
+          create: (context) => snapshot.data as UserModel,
+          child: Consumer<UserModel>(
+            builder: (context, value, child) => child!,
+            child: PageView.builder(
+              controller: _controller,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return _pages[_index];
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -141,6 +168,8 @@ class _HomePageState extends State<HomePage> {
     // Globally retrieve user future
     getUserFuture =
         context.read<DatabaseProvider>().getUser(_authProvider!.user.uid);
+    getUserStream =
+        context.read<DatabaseProvider>().streamUser(_authProvider!.user.uid);
   }
 
   @override

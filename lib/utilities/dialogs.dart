@@ -29,7 +29,6 @@ class Dialogs {
     BuildContext context, [
     String? status,
     String? detail,
-    VoidCallback? onPressed,
     String? buttonText,
   ]) {
     return showCupertinoModalPopup(
@@ -44,7 +43,7 @@ class Dialogs {
           detail: detail!,
           status: status!,
           buttonText: buttonText!,
-          buttonPressed: onPressed!,
+          buttonPressed: () => Navigator.of(context).pop(),
         ),
       ),
     );

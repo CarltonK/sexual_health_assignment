@@ -36,4 +36,38 @@ class DatabaseProvider {
       return error.message;
     }
   }
+
+  Stream<UserModel> streamUser(String uid) {
+    DocumentReference userDoc = _db.doc('users/$uid');
+    return userDoc.snapshots().map((user) => UserModel.fromFirestore(user));
+  }
+
+  Future updateName(String uid, String name) async {
+    try {
+      DocumentReference userDoc = _db.doc('users/$uid');
+      await userDoc.update({'name': name});
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future updateUserToken(String uid) async {
+    try {
+      DocumentReference userDoc = _db.doc('users/$uid');
+      String? token = await fcm.getToken();
+      await userDoc.update({'token': token});
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future deleteUserToken(String uid) async {
+    try {
+      FirebaseMessaging.instance.deleteToken();
+      DocumentReference userDoc = _db.doc('users/$uid');
+      await userDoc.update({'token': null});
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
 }

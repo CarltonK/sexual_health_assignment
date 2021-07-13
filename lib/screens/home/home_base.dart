@@ -1,10 +1,10 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sexual_health_assignment/helpers/helpers.dart';
 import 'package:sexual_health_assignment/models/models.dart';
 import 'package:sexual_health_assignment/provider/provider.dart';
+import 'package:sexual_health_assignment/screens/screens.dart';
 import 'package:sexual_health_assignment/utilities/utilities.dart';
 import 'package:sexual_health_assignment/widgets/widgets.dart';
 
@@ -23,20 +23,18 @@ class _HomePageState extends State<HomePage> {
   // ignore: unused_field
   NotificationHelper? _notificationHelper;
 
-  Dialogs? _dialogs;
-
   final List<Widget> _pages = [
-    Container(),
-    Container(),
-    Container(),
-    Container(),
+    MainScreen(),
+    OrderScreen(),
+    TestScreen(),
+    ProfileScreen(),
   ];
 
   final List<IconData> _iconsList = [
     Icons.home,
     Icons.receipt_long,
+    Icons.check,
     Icons.person,
-    Icons.access_alarm,
   ];
 
   _appBar() {
@@ -72,6 +70,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   _body() {
+    // Cost Optimization - Fetch the user once globally to avoid fetching on demand
     return FutureBuilder(
       future: getUserFuture,
       builder: (context, AsyncSnapshot snapshot) {
@@ -127,32 +126,15 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).pop();
   }
 
-  onForegroundMessage() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      if (message.notification != null) {
-        RemoteNotification notification = message.notification!;
-        await _dialogs!.dialogInfo(
-          context,
-          notification.title,
-          notification.body,
-          () => popDialog(),
-          'Cancel',
-        );
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     // Page View Controller
     _controller = PageController();
-    // Dialogs
-    _dialogs = Dialogs.empty();
 
     // Messaging Handler
-    onForegroundMessage();
     _notificationHelper = NotificationHelper();
+    _notificationHelper!.onForegroundMessage(context);
 
     // Globally retrieve auth
     _authProvider = context.read<AuthProvider>();
@@ -170,6 +152,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Handle on back button pressed
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(

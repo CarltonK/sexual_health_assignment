@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:sexual_health_assignment/helpers/helpers.dart';
 import 'package:sexual_health_assignment/provider/provider.dart';
 import 'package:sexual_health_assignment/screens/screens.dart';
 import 'package:sexual_health_assignment/widgets/widgets.dart';
@@ -12,8 +12,6 @@ import 'utilities/utilities.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   final List<SingleChildWidget> _providers = [
     ChangeNotifierProvider(create: (context) => AuthProvider.instance()),
@@ -26,10 +24,6 @@ void main() {
       child: MyApp(),
     ),
   );
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
 }
 
 class MyApp extends StatelessWidget {
@@ -54,6 +48,10 @@ class MyApp extends StatelessWidget {
             );
           }
           if (snapshot.connectionState == ConnectionState.done) {
+            // Listen for background notifications when FirebaseApp is created
+            NotificationHelper _helper = NotificationHelper();
+            _helper.onBackgroundMessage();
+
             return Consumer<AuthProvider>(
               builder: (context, value, child) {
                 if (value.status == Status.Authenticated) return HomePage();

@@ -1,12 +1,16 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:sexual_health_assignment/utilities/utilities.dart';
 // import 'package:sexual_health_assignment/models/models.dart';
 
 class NotificationHelper {
   FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  Dialogs? _dialogs;
   // NotificationModel? _notificationInfo;
 
   NotificationHelper() {
     _notificationHandler();
+    _dialogs = Dialogs.empty();
   }
 
   Future<void> _registerNotification() async {
@@ -22,10 +26,28 @@ class NotificationHelper {
     );
   }
 
-  // static Future<dynamic> _backgroundHandler(
-  //     Map<String, dynamic> message) async {
-  //   print('onBackgroundMessage received: $message');
-  // }
+  onForegroundMessage(BuildContext context) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.notification != null) {
+        RemoteNotification notification = message.notification!;
+        await _dialogs!.dialogInfo(
+          context,
+          notification.title,
+          notification.body,
+          'Cancel',
+        );
+      }
+    });
+  }
+
+  onBackgroundMessage() async {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  Future<void> _firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    print("Handling a background message: ${message.messageId}");
+  }
 
   // Future<dynamic> _onLaunch(Map<String, dynamic> message) async {
   //   print('onLaunch: $message');

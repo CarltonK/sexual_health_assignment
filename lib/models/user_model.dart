@@ -9,6 +9,8 @@ class UserModel {
   String? gender;
   String? genitalia;
   String? token;
+  bool? isSick;
+  Timestamp? sickUntil;
 
   UserModel({
     this.email,
@@ -19,6 +21,8 @@ class UserModel {
     this.gender,
     this.genitalia,
     this.token,
+    this.isSick = false,
+    this.sickUntil,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -42,5 +46,7 @@ class UserModel {
         'gender': gender,
         'genitalia': genitalia,
         'token': token,
+        'isSick': isSick,
+        'sickUntil': sickUntil,
       };
 }

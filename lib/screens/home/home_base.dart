@@ -26,14 +26,12 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     MainScreen(),
-    OrderScreen(),
     TestScreen(),
     ProfileScreen(),
   ];
 
   final List<IconData> _iconsList = [
     Icons.home,
-    Icons.receipt_long,
     Icons.check,
     Icons.person,
   ];
@@ -179,6 +177,10 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  _navigateToOrders() => Navigator.of(context).push(
+        SlideLeftTransition(page: OrderScreen(), routeName: 'orders'),
+      );
+
   @override
   Widget build(BuildContext context) {
     // Handle on back button pressed
@@ -192,7 +194,7 @@ class _HomePageState extends State<HomePage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
-          onPressed: () {},
+          onPressed: _navigateToOrders,
         ),
       ),
     );

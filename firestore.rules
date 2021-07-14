@@ -6,6 +6,15 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // I own the order if my uid corresponds to the owner field
+    function isIncomingOrderOwned() {
+      return request.resource.data.owner == request.auth.uid;
+    }
+
+    function isExistingOrderOwned() {
+      return resource.data.owner == request.auth.uid;
+    }
+
     function isOwner(user) {
       return request.auth.uid == user;
     }
@@ -16,6 +25,15 @@ service cloud.firestore {
 
     match /users/{user} {
       allow read, write: if isAuthenticated() && isOwner(user);
+    }
+
+    match /orders/{order} {
+      allow read: if isAuthenticated() && isExistingOrderOwned();
+      allow write: if isAuthenticated() && isIncomingOrderOwned();
+    }
+
+    match /tests/{test} {
+      allow read: if isAuthenticated();
     }
   }
 }

@@ -20,10 +20,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
   UserModel? user;
 
-  String? email;
-  String? fullName;
-  String? password;
-  String? confirmPassword;
+  String? email, fullName, password, confirmPassword;
 
   dynamic _registrationResult;
 

@@ -70,4 +70,48 @@ class DatabaseProvider {
       return error.message;
     }
   }
+
+  Future getTests() async {
+    try {
+      QuerySnapshot snapshot = await _db.collection('tests').get();
+      return snapshot.docs.map((doc) => TestModel.fromFirestore(doc));
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future getRecentOrders(String uid) async {
+    try {
+      QuerySnapshot snapshot = await _db
+          .collection('orders')
+          .where('owner', isEqualTo: uid)
+          .orderBy('orderedAt', descending: true)
+          .limit(2)
+          .get();
+      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc));
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future getAllOrders(String uid) async {
+    try {
+      QuerySnapshot snapshot = await _db
+          .collection('orders')
+          .where('owner', isEqualTo: uid)
+          .orderBy('orderedAt', descending: true)
+          .get();
+      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc));
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future createOrder(OrderModel order) async {
+    try {
+      await _db.collection('orders').doc().set(order.toFirestore());
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
 }

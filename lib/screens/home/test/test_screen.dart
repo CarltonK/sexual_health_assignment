@@ -65,7 +65,7 @@ class _TestScreenState extends State<TestScreen> {
                     child: GlobalInfoDialog(message: 'There are no tests'),
                   );
                 case ConnectionState.done:
-                  List<TestModel> tests = snapshot.data.toList();
+                  List<TestModel> tests = snapshot.data;
                   return ListView.builder(
                     itemCount: tests.length,
                     itemBuilder: (context, index) {

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sexual_health_assignment/models/models.dart';
 
 class OrderModel {
   String? owner;
@@ -40,5 +39,6 @@ class OrderModel {
         'owner': owner,
         'test': test,
         'resultReleasedAt': resultReleasedAt,
+        'orderedAt': Timestamp.now(),
       };
 }

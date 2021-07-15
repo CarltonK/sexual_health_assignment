@@ -106,9 +106,8 @@ export default class PubsubHandler {
             const updateHealthJob: Promise<firestore.WriteResult>[] = [];
 
             userDocuments.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
-                // Check if isSick
                 const { isSick, sickUntil } = doc.data()!;
-                // Check if time right now > sickUntil
+                // Check if isSick && time right now > sickUntil
                 if (isSick && (timeRightNow.toDate() > sickUntil.toDate())) {
                     updateHealthJob.push(this.db.collection('users').doc(doc.id).update({
                         isSick: false,

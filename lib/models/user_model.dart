@@ -35,6 +35,9 @@ class UserModel {
         name: data['name'] ?? '',
         genitalia: data['genitalia'] ?? '',
         uid: doc.id,
+        isSick: data['isSick'] ?? false,
+        sickUntil: data['sickUntil'],
+        isSickWith: data['isSickWith'] ?? '',
       );
     } else {
       return UserModel();

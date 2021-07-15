@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> {
       activeIndex: _index,
       onTap: _pageSwitcher,
       notchSmoothness: NotchSmoothness.smoothEdge,
-      gapLocation: GapLocation.end,
       leftCornerRadius: 32,
       rightCornerRadius: 0,
       splashSpeedInMilliseconds: 200,
@@ -177,10 +176,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  _navigateToOrders() => Navigator.of(context).push(
-        SlideLeftTransition(page: OrderScreen(), routeName: 'orders'),
-      );
-
   @override
   Widget build(BuildContext context) {
     // Handle on back button pressed
@@ -191,11 +186,6 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         body: _body(),
         bottomNavigationBar: _bottomBar(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: _navigateToOrders,
-        ),
       ),
     );
   }

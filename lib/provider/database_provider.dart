@@ -77,7 +77,7 @@ class DatabaseProvider {
           .collection('tests')
           .where('genitalia', arrayContains: genitalia)
           .get();
-      return snapshot.docs.map((doc) => TestModel.fromFirestore(doc));
+      return snapshot.docs.map((doc) => TestModel.fromFirestore(doc)).toList();
     } on FirebaseException catch (error) {
       return error.message;
     }
@@ -89,9 +89,9 @@ class DatabaseProvider {
           .collection('orders')
           .where('owner', isEqualTo: uid)
           .orderBy('orderedAt', descending: true)
-          .limit(2)
+          .limit(3)
           .get();
-      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc));
+      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc)).toList();
     } on FirebaseException catch (error) {
       return error.message;
     }

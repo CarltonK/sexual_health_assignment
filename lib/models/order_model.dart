@@ -39,5 +39,6 @@ class OrderModel {
   Map<String, dynamic> toFirestore() => {
         'owner': owner,
         'test': test,
+        'resultReleasedAt': resultReleasedAt,
       };
 }

@@ -33,6 +33,7 @@ class UserModel {
       return UserModel(
         email: data['email'] ?? '',
         name: data['name'] ?? '',
+        genitalia: data['genitalia'] ?? '',
         uid: doc.id,
       );
     } else {

@@ -6,13 +6,15 @@ class OrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SizedBox(
-        width: double.infinity,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: getProportionateScreenWidth(20),
-            vertical: getProportionateScreenHeight(10),
+    return Scaffold(
+      body: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: getProportionateScreenWidth(20),
+              vertical: getProportionateScreenHeight(10),
+            ),
           ),
         ),
       ),

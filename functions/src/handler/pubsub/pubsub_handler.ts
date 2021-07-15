@@ -1,17 +1,45 @@
 import { Logger } from '@firebase/logger';
 import { firestore } from 'firebase-admin';
-// import NotificationHelper from '../../helper/notification_helper';
+import NotificationHelper from '../../helper/notification_helper';
 
-export default class OrderHandler {
-    private logger: Logger = new Logger('NewOrderDocument');
+
+export default class PubsubHandler {
+    private logger: Logger = new Logger('PubsubHandler');
     private db = firestore();
-    // private notificationHelper: NotificationHelper = new NotificationHelper();
+    private notificationHelper: NotificationHelper = new NotificationHelper();
 
     constructor() {
         this.logger.setLogLevel('debug');
     }
 
-    async timedBackgroundJob() {
+    async constantReminderJob() {
+        // Should be every 18 hours
+        // Retrieve all user documents
+        try {
+            const usersQueries: FirebaseFirestore.QuerySnapshot = await this.db.collection('users').get();
+            const userDocuments: FirebaseFirestore.DocumentSnapshot[] = usersQueries.docs;
+
+            if (userDocuments.length > 0) {
+                // Send a notification for each user
+                // Perform job simultaneously using parallel processing
+                const notificationJob: Promise<void>[] = []
+                userDocuments.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+                    // Retrieve the user fcm token
+                    const { token } = doc.data()!
+
+                    if (token) {
+                        notificationJob.push(this.notificationHelper.singleNotificationSend(token, 'Troglo', 'It\'s time to take a test'));
+                    }
+                });
+                await Promise.all(notificationJob);
+            }
+        } catch (error) {
+            this.logger.error('constantReminderJob Error: ', error);
+        }
+        return null;
+    }
+
+    async orderProcessingJob() {
         const timeRightNow: firestore.Timestamp = firestore.Timestamp.now();
         // Should be every 45 mins. THIS IS AN ASSUMPTION
         // Retrieve all order documents without a resultReleasedAt field which means a result hasn't been posted
@@ -25,7 +53,7 @@ export default class OrderHandler {
             const result: string = randomElement ? 'sick' : 'healthy';
 
             console.log('The result is: ', result);
-            
+
             if (randomElement) {
                 if (orderDocuments.length > 0) {
                     // Send a result for each document
@@ -63,7 +91,37 @@ export default class OrderHandler {
                 }
             }
         } catch (error) {
-            this.logger.error(error);
+            this.logger.error('orderProcessingJob Error', error);
+        }
+        return null;
+    }
+
+    async healthCheckingJob() {
+        const timeRightNow: firestore.Timestamp = firestore.Timestamp.now();
+        try {
+
+            const usersQueries: FirebaseFirestore.QuerySnapshot = await this.db.collection('users').get();
+            const userDocuments: FirebaseFirestore.DocumentSnapshot[] = usersQueries.docs;
+
+            const updateHealthJob: Promise<firestore.WriteResult>[] = [];
+
+            userDocuments.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+                // Check if isSick
+                const { isSick, sickUntil } = doc.data()!;
+                // Check if time right now > sickUntil
+                if (isSick && (timeRightNow.toDate() > sickUntil.toDate())) {
+                    updateHealthJob.push(this.db.collection('users').doc(doc.id).update({
+                        isSick: false,
+                        sickUntil: null,
+                        isSickWith: null,
+                    }))
+                }
+            });
+
+            await Promise.all(updateHealthJob);
+
+        } catch (error) {
+            this.logger.error('healthCheckingJob Error', error);
         }
         return null;
     }

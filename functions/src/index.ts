@@ -5,8 +5,7 @@ import * as admin from 'firebase-admin';
 admin.initializeApp();
 
 import UserDocumentHandler from './handler/firestore/newUserDocument';
-import ConstantReminderHandler from './handler/pubsub/constantReminder';
-import OrderHandler from './handler/pubsub/orderHandler';
+import PubsubHandler from './handler/pubsub/pubsub_handler';
 
 const logger = new Logger('Root');
 logger.setLogLevel('debug');
@@ -20,8 +19,7 @@ const runOptions: functions.RuntimeOptions = {
 const regionalFunctions = functions.runWith(runOptions).region('europe-west3');
 
 const GlobalUserDocumentHandler = new UserDocumentHandler();
-const GlobalConstantReminderHandler = new ConstantReminderHandler();
-const GlobalOrderHandler = new OrderHandler();
+const GlobalPubsubHandler = new PubsubHandler();
 
 /******************
 * Firestore Trigger(s)
@@ -37,10 +35,15 @@ export const newUserDocument = regionalFunctions.firestore.document('users/{user
 
 export const constantReminder = regionalFunctions.pubsub.schedule('every 18 hours')
   .timeZone('Africa/Nairobi')
-  .onRun(GlobalConstantReminderHandler
-    .timedBackgroundJob.bind(GlobalConstantReminderHandler));
+  .onRun(GlobalPubsubHandler
+    .constantReminderJob.bind(GlobalPubsubHandler));
 
 export const orderHandler = regionalFunctions.pubsub.schedule('every 45 mins')
   .timeZone('Africa/Nairobi')
-  .onRun(GlobalOrderHandler
-    .timedBackgroundJob.bind(GlobalOrderHandler));
+  .onRun(GlobalPubsubHandler
+    .orderProcessingJob.bind(GlobalPubsubHandler));
+
+export const healthChecker = regionalFunctions.pubsub.schedule('every 24 hours')
+  .timeZone('Africa/Nairobi')
+  .onRun(GlobalPubsubHandler
+    .healthCheckingJob.bind(GlobalPubsubHandler));

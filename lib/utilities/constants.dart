@@ -4,6 +4,24 @@ class Constants {
   // Constructor
   Constants.empty();
 
+  // Genitalia
+  static const List<String> genitalia = ['male', 'female', 'other'];
+
+  // Genders
+  static const List<String> gender = [
+    'lesbian',
+    'gay',
+    'bisexual',
+    'transgender',
+    'questioning',
+    'queer',
+    'intersex',
+    'pansexual',
+    'two-spirit',
+    'androgynous',
+    'asexual'
+  ];
+
   /*
   TEXT STYLES
   */

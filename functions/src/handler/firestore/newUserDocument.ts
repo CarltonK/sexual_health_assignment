@@ -25,14 +25,14 @@ export default class UserDocumentHandler {
             if (token) {
                 await this.notificationHelper.singleNotificationSend(
                     token,
-                    'Welcome to kweliscore',
+                    'Welcome',
                     'Glad to have you on board'
                 );
             }
             this.logger.info(`The user identified by ${uid} was created at ${createdAt.toDate()}`);
             await userDocRef.update({ createdAt: createdAt });
         } catch (error) {
-            this.logger.error('newUserDocumentHandler: ', error);
+            this.logger.error(error);
         }
         return;
     }

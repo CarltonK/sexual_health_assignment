@@ -3,7 +3,7 @@ import 'package:sexual_health_assignment/models/models.dart';
 
 class OrderModel {
   String? owner;
-  List<TestModel>? tests;
+  String? test;
   String? orderId;
   Timestamp? orderedAt;
   String? result;
@@ -12,7 +12,7 @@ class OrderModel {
 
   OrderModel({
     this.owner,
-    this.tests,
+    this.test,
     this.orderId,
     this.orderedAt,
     this.result,
@@ -25,7 +25,7 @@ class OrderModel {
       dynamic data = doc.data();
       return OrderModel(
         orderId: doc.id,
-        tests: data['tests'] ?? '',
+        test: data['test'] ?? '',
         orderedAt: data['orderedAt'],
         result: data['result'],
         resultReleasedAt: data['resultReleasedAt'],
@@ -38,6 +38,6 @@ class OrderModel {
 
   Map<String, dynamic> toFirestore() => {
         'owner': owner,
-        'tests': tests,
+        'test': test,
       };
 }

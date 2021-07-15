@@ -1,5 +1,7 @@
 import 'dart:async';
-
+// Only show Timestamp
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sexual_health_assignment/models/models.dart';
@@ -20,7 +22,8 @@ class _SignUpFormState extends State<SignUpForm> {
 
   UserModel? user;
 
-  String? email, fullName, password, confirmPassword;
+  String? email, fullName, password, confirmPassword, gender, genitalia;
+  Timestamp? _dob;
 
   dynamic _registrationResult;
 
@@ -197,6 +200,75 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
+  Widget buildDateSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Date of Birth',
+          ),
+          Container(
+            height: 200,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (DateTime newDateTime) {
+                _dob = Timestamp.fromDate(newDateTime);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  buildGenderSelector() {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      margin: const EdgeInsets.only(top: 15),
+      child: DropdownButton<String>(
+        value: gender,
+        onChanged: _genderChanged,
+        icon: Icon(Icons.arrow_downward, color: Theme.of(context).accentColor),
+        hint: Text('Choose'),
+        items: Constants.gender
+            .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+            .toList(),
+        isExpanded: true,
+        isDense: false,
+        underline: Container(color: Colors.transparent),
+      ),
+    );
+  }
+
+  _genderChanged(String? value) {
+    gender = value;
+  }
+
+  buildGenitaliaSelector() {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      margin: const EdgeInsets.only(top: 15),
+      child: DropdownButton<String>(
+        value: genitalia,
+        onChanged: _genitaliaChanged,
+        icon: Icon(Icons.arrow_downward, color: Theme.of(context).accentColor),
+        hint: Text('Choose'),
+        items: Constants.genitalia
+            .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+            .toList(),
+        isExpanded: true,
+        isDense: false,
+        underline: Container(color: Colors.transparent),
+      ),
+    );
+  }
+
+  _genitaliaChanged(String? value) {
+    genitalia = value;
+  }
+
   Future<bool> _regHandler(UserModel user) async {
     _registrationResult = await context.read<AuthProvider>().createUser(user);
 
@@ -209,37 +281,64 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   registrationButtonPressed() {
-    final FormState _formState = _signUpFormKey.currentState!;
-    if (_formState.validate()) {
-      _formState.save();
+    if (_dob == null) {
+      Timer(Duration(milliseconds: 200), () async {
+        await showInfoDialog(
+          widget.scaffoldKey.currentContext!,
+          'Please select the date of birth',
+        );
+      });
+    } else if (gender == null) {
+      Timer(Duration(milliseconds: 200), () async {
+        await showInfoDialog(
+          widget.scaffoldKey.currentContext!,
+          'Please select your gender',
+        );
+      });
+    }
+    if (genitalia == null) {
+      Timer(Duration(milliseconds: 200), () async {
+        await showInfoDialog(
+          widget.scaffoldKey.currentContext!,
+          'Please select your genitalia',
+        );
+      });
+    } else {
+      final FormState _formState = _signUpFormKey.currentState!;
+      if (_formState.validate()) {
+        _formState.save();
 
-      KeyboardUtil.hideKeyboard(context);
+        KeyboardUtil.hideKeyboard(context);
 
-      user = UserModel(
-        email: email,
-        name: fullName,
-        password: confirmPassword,
-      );
+        user = UserModel(
+          email: email,
+          name: fullName,
+          password: confirmPassword,
+          dob: _dob,
+          gender: gender,
+          genitalia: genitalia,
+        );
 
-      _regHandler(user!).then((value) {
-        if (!value) {
+        _regHandler(user!).then((value) {
+          if (!value) {
+            Timer(Duration(milliseconds: 500), () async {
+              await showInfoDialog(
+                widget.scaffoldKey.currentContext!,
+                _registrationResult,
+              );
+            });
+          } else {
+            Navigator.of(context).pop();
+          }
+        }).catchError((error) {
           Timer(Duration(milliseconds: 500), () async {
             await showInfoDialog(
               widget.scaffoldKey.currentContext!,
-              _registrationResult,
+              error.toString(),
             );
           });
-        } else {
-          Navigator.of(context).pop();
-        }
-      }).catchError((error) {
-        Timer(Duration(milliseconds: 500), () async {
-          await showInfoDialog(
-            widget.scaffoldKey.currentContext!,
-            error.toString(),
-          );
         });
-      });
+      }
     }
   }
 
@@ -266,6 +365,12 @@ class _SignUpFormState extends State<SignUpForm> {
           buildFullNameField(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildEmailField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildDateSelector(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildGenderSelector(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildGenitaliaSelector(),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),

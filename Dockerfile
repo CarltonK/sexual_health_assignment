@@ -37,4 +37,4 @@ WORKDIR /app
 
 RUN cd functions; npm i
 
-ENTRYPOINT [ "make", "serve" ]
+ENTRYPOINT [ "make", "serve-dev" ]

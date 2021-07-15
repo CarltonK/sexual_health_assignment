@@ -61,38 +61,38 @@ class _HomePageState extends State<HomePage> {
       activeIndex: _index,
       onTap: _pageSwitcher,
       notchSmoothness: NotchSmoothness.smoothEdge,
-      gapLocation: GapLocation.center,
+      gapLocation: GapLocation.end,
       leftCornerRadius: 32,
-      rightCornerRadius: 32,
+      rightCornerRadius: 0,
       splashSpeedInMilliseconds: 200,
     );
   }
 
-  _bodyStream() {
-    return StreamBuilder(
-      stream: getUserStream,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(child: GlobalInfoDialog(message: '${snapshot.error}'));
-        } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return GlobalLoader();
-        }
-        return Provider<UserModel>(
-          create: (context) => snapshot.data as UserModel,
-          child: Consumer<UserModel>(
-            builder: (context, value, child) => child!,
-            child: PageView.builder(
-              controller: _controller,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return _pages[_index];
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // _bodyStream() {
+  //   return StreamBuilder(
+  //     stream: getUserStream,
+  //     builder: (context, snapshot) {
+  //       if (snapshot.hasError) {
+  //         return Center(child: GlobalInfoDialog(message: '${snapshot.error}'));
+  //       } else if (snapshot.connectionState == ConnectionState.waiting) {
+  //         return GlobalLoader();
+  //       }
+  //       return Provider<UserModel>(
+  //         create: (context) => snapshot.data as UserModel,
+  //         child: Consumer<UserModel>(
+  //           builder: (context, value, child) => child!,
+  //           child: PageView.builder(
+  //             controller: _controller,
+  //             physics: NeverScrollableScrollPhysics(),
+  //             itemBuilder: (context, index) {
+  //               return _pages[_index];
+  //             },
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   _body() {
     // Cost Optimization - Fetch the user once globally to avoid fetching on demand
@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         body: _body(),
         bottomNavigationBar: _bottomBar(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: _navigateToOrders,

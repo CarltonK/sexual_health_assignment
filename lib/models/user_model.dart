@@ -9,6 +9,7 @@ class UserModel {
   String? gender;
   String? genitalia;
   String? token;
+  String? isSickWith;
   bool? isSick;
   Timestamp? sickUntil;
 
@@ -19,6 +20,7 @@ class UserModel {
     this.dob,
     this.name,
     this.gender,
+    this.isSickWith,
     this.genitalia,
     this.token,
     this.isSick = false,
@@ -48,5 +50,6 @@ class UserModel {
         'token': token,
         'isSick': isSick,
         'sickUntil': sickUntil,
+        'isSickWith': isSickWith,
       };
 }

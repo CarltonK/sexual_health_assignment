@@ -71,9 +71,12 @@ class DatabaseProvider {
     }
   }
 
-  Future getTests() async {
+  Future getTests(String genitalia) async {
     try {
-      QuerySnapshot snapshot = await _db.collection('tests').get();
+      QuerySnapshot snapshot = await _db
+          .collection('tests')
+          .where('genitalia', arrayContains: genitalia)
+          .get();
       return snapshot.docs.map((doc) => TestModel.fromFirestore(doc));
     } on FirebaseException catch (error) {
       return error.message;

@@ -7,7 +7,8 @@
     "predeploy": [
       "npm --prefix \"$RESOURCE_DIR\" run lint",
       "npm --prefix \"$RESOURCE_DIR\" run build"
-    ]
+    ],
+    "source": "functions"
   },
   "storage": {
     "rules": "storage.rules"
@@ -21,11 +22,11 @@
       "port": 5001
     },
     "firestore": {
-      "port": 4001,
+      "port": 8080,
       "host": "localhost"
     },
-    "storage": {
-      "port": 9199
+    "pubsub": {
+      "port": 9000
     },
     "ui": {
       "enabled": true

@@ -231,7 +231,7 @@ class _SignUpFormState extends State<SignUpForm> {
         value: gender,
         onChanged: _genderChanged,
         icon: Icon(Icons.arrow_downward, color: Theme.of(context).accentColor),
-        hint: Text('Choose'),
+        hint: Text('Gender'),
         items: Constants.gender
             .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
             .toList(),
@@ -254,7 +254,7 @@ class _SignUpFormState extends State<SignUpForm> {
         value: genitalia,
         onChanged: _genitaliaChanged,
         icon: Icon(Icons.arrow_downward, color: Theme.of(context).accentColor),
-        hint: Text('Choose'),
+        hint: Text('Genitalia'),
         items: Constants.genitalia
             .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
             .toList(),

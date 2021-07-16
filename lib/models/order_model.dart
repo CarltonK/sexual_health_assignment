@@ -28,7 +28,7 @@ class OrderModel {
         orderedAt: data['orderedAt'],
         result: data['result'],
         resultReleasedAt: data['resultReleasedAt'],
-        notes: data['notes'] ?? '',
+        notes: data['notes'],
       );
     } else {
       return OrderModel();

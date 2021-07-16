@@ -67,31 +67,32 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // _bodyStream() {
-  //   return StreamBuilder(
-  //     stream: getUserStream,
-  //     builder: (context, snapshot) {
-  //       if (snapshot.hasError) {
-  //         return Center(child: GlobalInfoDialog(message: '${snapshot.error}'));
-  //       } else if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return GlobalLoader();
-  //       }
-  //       return Provider<UserModel>(
-  //         create: (context) => snapshot.data as UserModel,
-  //         child: Consumer<UserModel>(
-  //           builder: (context, value, child) => child!,
-  //           child: PageView.builder(
-  //             controller: _controller,
-  //             physics: NeverScrollableScrollPhysics(),
-  //             itemBuilder: (context, index) {
-  //               return _pages[_index];
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+  _bodyStream() {
+    return StreamBuilder(
+      stream: Provider.of<DatabaseProvider>(context)
+          .streamUser(_authProvider!.user.uid),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: GlobalInfoDialog(message: '${snapshot.error}'));
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return GlobalLoader();
+        }
+        return Provider<UserModel>(
+          create: (context) => snapshot.data as UserModel,
+          child: Consumer<UserModel>(
+            builder: (context, value, child) => child!,
+            child: PageView.builder(
+              controller: _controller,
+              physics: NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return _pages[_index];
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   _body() {
     // Cost Optimization - Fetch the user once globally to avoid fetching on demand
@@ -165,8 +166,6 @@ class _HomePageState extends State<HomePage> {
     // Globally retrieve user future
     getUserFuture =
         context.read<DatabaseProvider>().getUser(_authProvider!.user.uid);
-    getUserStream =
-        context.read<DatabaseProvider>().streamUser(_authProvider!.user.uid);
   }
 
   @override
@@ -184,7 +183,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: _appBar(),
         backgroundColor: Colors.white,
-        body: _body(),
+        body: _bodyStream(),
         bottomNavigationBar: _bottomBar(),
       ),
     );

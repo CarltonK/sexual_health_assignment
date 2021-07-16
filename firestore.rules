@@ -28,8 +28,8 @@ service cloud.firestore {
     }
 
     match /orders/{order} {
-      allow read: if isAuthenticated() && isExistingOrderOwned();
-      allow write: if isAuthenticated() && isIncomingOrderOwned();
+      allow read, update, delete: if isAuthenticated() && isExistingOrderOwned();
+      allow create: if isAuthenticated() && isIncomingOrderOwned();
     }
 
     match /tests/{test} {

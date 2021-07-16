@@ -4,7 +4,7 @@ import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
-import UserDocumentHandler from './handler/firestore/newUserDocument';
+import FirestoreHandler from './handler/firestore/firestore_handler';
 import PubsubHandler from './handler/pubsub/pubsub_handler';
 
 const logger = new Logger('Root');
@@ -18,7 +18,7 @@ const runOptions: functions.RuntimeOptions = {
 };
 const regionalFunctions = functions.runWith(runOptions).region('europe-west3');
 
-const GlobalUserDocumentHandler = new UserDocumentHandler();
+const GlobalFirestoreHandler = new FirestoreHandler();
 const GlobalPubsubHandler = new PubsubHandler();
 
 /******************
@@ -26,8 +26,12 @@ const GlobalPubsubHandler = new PubsubHandler();
 ******************/
 
 export const newUserDocument = regionalFunctions.firestore.document('users/{user}')
-  .onCreate(GlobalUserDocumentHandler
-    .newUserDocumentHandler.bind(GlobalUserDocumentHandler));
+  .onCreate(GlobalFirestoreHandler
+    .newUserDocument.bind(GlobalFirestoreHandler));
+
+export const sicknessNotifier = regionalFunctions.firestore.document('orders/{order}')
+  .onUpdate(GlobalFirestoreHandler
+    .sicknessNotifier.bind(GlobalFirestoreHandler));
 
 /******************
 * Pubsub Trigger(s)

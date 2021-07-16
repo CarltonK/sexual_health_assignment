@@ -104,7 +104,7 @@ class DatabaseProvider {
           .where('owner', isEqualTo: uid)
           .orderBy('orderedAt', descending: true)
           .get();
-      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc));
+      return snapshot.docs.map((doc) => OrderModel.fromFirestore(doc)).toList();
     } on FirebaseException catch (error) {
       return error.message;
     }
@@ -113,6 +113,23 @@ class DatabaseProvider {
   Future createOrder(OrderModel order) async {
     try {
       await _db.collection('orders').doc().set(order.toFirestore());
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future deleteOrder(String orderId) async {
+    try {
+      await _db.collection('orders').doc(orderId).delete();
+    } on FirebaseException catch (error) {
+      return error.message;
+    }
+  }
+
+  Future updateOrderNotes(String orderId, String notes) async {
+    try {
+      DocumentReference orderDoc = _db.doc('orders/$orderId');
+      await orderDoc.update({'notes': notes});
     } on FirebaseException catch (error) {
       return error.message;
     }

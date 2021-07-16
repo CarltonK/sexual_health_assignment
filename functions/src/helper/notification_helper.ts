@@ -22,7 +22,7 @@ export default class NotificationHelper {
                 await this.fcm.sendToDevice(token, payload);
             }
         } catch (error) {
-            this.logger.error('singleNotificationSendERROR: ',error);
+            this.logger.error('singleNotificationSend Error: ',error);
         }
         return;
     }

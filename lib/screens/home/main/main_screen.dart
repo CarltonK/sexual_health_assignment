@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               const SizedBox(height: 10),
             ] else ...[
-              Icon(Icons.sentiment_satisfied, size: 150),
+              Icon(Icons.sentiment_satisfied, size: 150, color: Colors.green),
               Text('You\'re currently healthy'),
             ]
           ],
@@ -58,6 +58,9 @@ class _MainScreenState extends State<MainScreen> {
               );
             case ConnectionState.done:
               List<OrderModel> orders = snapshot.data;
+              if (orders.length == 0) {
+                return GlobalInfoDialog(message: 'There are no past orders');
+              }
               return ListView.builder(
                 itemCount: orders.length,
                 itemBuilder: (context, index) {
@@ -67,7 +70,8 @@ class _MainScreenState extends State<MainScreen> {
                         'Order Number: ${orders[index].orderId!}',
                       ),
                       subtitle: Text(
-                          'Ordered At: ${orders[index].orderedAt!.toDate()}'),
+                        'Ordered At: ${orders[index].orderedAt!.toDate()}',
+                      ),
                     ),
                   );
                 },
